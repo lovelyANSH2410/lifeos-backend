@@ -15,8 +15,11 @@ export const registerUser = async (userData) => {
       throw new Error(MESSAGES.USER_EXISTS);
     }
 
-    // Create user
-    const user = await User.create(userData);
+    // Create user with default currency
+    const user = await User.create({
+      ...userData,
+      currency: userData.currency || 'INR'
+    });
 
     // Generate token
     const token = generateToken(user._id);
@@ -90,6 +93,50 @@ export const getUserById = async (userId) => {
     return user;
   } catch (error) {
     logger.error(`Get user by ID error: ${error.message}`);
+    throw error;
+  }
+};
+
+/**
+ * Update user profile
+ */
+export const updateUserProfile = async (userId, updateData) => {
+  try {
+    const allowedFields = ['name', 'currency'];
+    const updateFields = {};
+
+    // Only allow specific fields to be updated
+    Object.keys(updateData).forEach(key => {
+      if (allowedFields.includes(key)) {
+        updateFields[key] = updateData[key];
+      }
+    });
+
+    // Validate currency if provided
+    if (updateFields.currency) {
+      const validCurrencies = ['USD', 'EUR', 'GBP', 'INR', 'JPY', 'CAD', 'AUD'];
+      if (!validCurrencies.includes(updateFields.currency.toUpperCase())) {
+        throw new Error('Invalid currency. Supported currencies: USD, EUR, GBP, INR, JPY, CAD, AUD');
+      }
+      updateFields.currency = updateFields.currency.toUpperCase();
+    }
+
+    const user = await User.findByIdAndUpdate(
+      userId,
+      updateFields,
+      {
+        new: true,
+        runValidators: true
+      }
+    );
+
+    if (!user) {
+      throw new Error(MESSAGES.USER_NOT_FOUND);
+    }
+
+    return user;
+  } catch (error) {
+    logger.error(`Update user profile error: ${error.message}`);
     throw error;
   }
 };

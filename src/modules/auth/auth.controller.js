@@ -79,3 +79,54 @@ export const getProfile = async (req, res, next) => {
     next(error);
   }
 };
+
+/**
+ * Update user profile
+ */
+export const updateProfile = async (req, res, next) => {
+  try {
+    const { name, currency } = req.body;
+
+    // Validate currency if provided
+    if (currency) {
+      const validCurrencies = ['USD', 'EUR', 'GBP', 'INR', 'JPY', 'CAD', 'AUD'];
+      if (!validCurrencies.includes(currency.toUpperCase())) {
+        return sendValidationError(res, [{
+          field: 'currency',
+          message: `Currency must be one of: ${validCurrencies.join(', ')}`
+        }]);
+      }
+    }
+
+    // Validate name if provided
+    if (name !== undefined) {
+      if (!name || name.trim().length < 2) {
+        return sendValidationError(res, [{
+          field: 'name',
+          message: 'Name must be at least 2 characters'
+        }]);
+      }
+      if (name.trim().length > 50) {
+        return sendValidationError(res, [{
+          field: 'name',
+          message: 'Name cannot exceed 50 characters'
+        }]);
+      }
+    }
+
+    const updateData = {};
+    if (name !== undefined) updateData.name = name.trim();
+    if (currency !== undefined) updateData.currency = currency.toUpperCase();
+
+    const user = await authService.updateUserProfile(req.user.id, updateData);
+    return sendSuccess(res, user, 'Profile updated successfully');
+  } catch (error) {
+    logger.error(`Update profile error: ${error.message}`);
+    
+    if (error.message === MESSAGES.USER_NOT_FOUND) {
+      return sendError(res, error.message, HTTP_STATUS.NOT_FOUND);
+    }
+
+    next(error);
+  }
+};
