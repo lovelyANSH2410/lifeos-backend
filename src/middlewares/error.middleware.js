@@ -42,6 +42,19 @@ export const errorHandler = (err, req, res, next) => {
     return sendError(res, 'Invalid resource ID', HTTP_STATUS.BAD_REQUEST);
   }
 
+  // Multer errors (file upload)
+  if (err.code === 'LIMIT_FILE_SIZE') {
+    return sendError(res, 'File size too large. Maximum size is 5MB', HTTP_STATUS.BAD_REQUEST);
+  }
+
+  if (err.code === 'LIMIT_FILE_COUNT') {
+    return sendError(res, 'Too many files. Maximum is 5 images per entry', HTTP_STATUS.BAD_REQUEST);
+  }
+
+  if (err.message && err.message.includes('Only image files are allowed')) {
+    return sendError(res, 'Only image files are allowed', HTTP_STATUS.BAD_REQUEST);
+  }
+
   // JWT errors
   if (err.name === 'JsonWebTokenError') {
     return sendError(res, 'Invalid token', HTTP_STATUS.UNAUTHORIZED);

@@ -10,6 +10,7 @@ import { apiLimiter } from './middlewares/rateLimit.middleware.js';
 // Import routes
 import authRoutes from './modules/auth/auth.routes.js';
 import dashboardRoutes from './modules/dashboard/dashboard.routes.js';
+import diaryRoutes from './modules/diary/diary.routes.js';
 
 const app = express();
 
@@ -48,6 +49,7 @@ app.get('/health', (req, res) => {
 // API routes
 app.use('/api/auth', authRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/diary', diaryRoutes);
 
 // Placeholder routes for future modules
 app.use('/api/tasks', (req, res) => {
@@ -58,9 +60,6 @@ app.use('/api/expenses', (req, res) => {
 });
 app.use('/api/subscriptions', (req, res) => {
   res.status(200).json({ success: true, message: 'Subscriptions module - Coming soon' });
-});
-app.use('/api/journal', (req, res) => {
-  res.status(200).json({ success: true, message: 'Journal module - Coming soon' });
 });
 app.use('/api/goals', (req, res) => {
   res.status(200).json({ success: true, message: 'Goals module - Coming soon' });
