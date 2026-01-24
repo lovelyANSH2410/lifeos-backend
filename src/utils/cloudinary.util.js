@@ -113,4 +113,92 @@ export const deleteImages = async (publicIds) => {
   }
 };
 
+/**
+ * Upload a document to Cloudinary (raw resource type)
+ * @param {Buffer} fileBuffer - File buffer
+ * @param {string} originalName - Original filename
+ * @param {string} folder - Cloudinary folder path
+ * @returns {Promise<Object>} Upload result with publicId, url, format, size
+ */
+export const uploadDocument = async (fileBuffer, originalName, folder = 'lifeos/documents') => {
+  try {
+    return new Promise((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        {
+          resource_type: 'raw',
+          folder: folder,
+          public_id: originalName.replace(/\.[^/.]+$/, ''), // Remove extension
+          allowed_formats: ['pdf', 'jpg', 'jpeg', 'png', 'webp'],
+          format: 'auto',
+        },
+        (error, result) => {
+          if (error) {
+            logger.error(`Failed to upload document: ${error.message}`);
+            reject(error);
+          } else {
+            logger.info(`Document uploaded successfully: ${result.public_id}`);
+            resolve({
+              publicId: result.public_id,
+              url: result.secure_url,
+              format: result.format || originalName.split('.').pop(),
+              size: result.bytes
+            });
+          }
+        }
+      );
+
+      uploadStream.end(fileBuffer);
+    });
+  } catch (error) {
+    logger.error(`Upload document error: ${error.message}`);
+    throw error;
+  }
+};
+
+/**
+ * Delete a document from Cloudinary
+ * @param {string} publicId - Cloudinary public ID
+ * @returns {Promise<Object>} Deletion result
+ */
+export const deleteDocument = async (publicId) => {
+  try {
+    const result = await cloudinary.uploader.destroy(publicId, {
+      resource_type: 'raw',
+      invalidate: true
+    });
+
+    if (result.result !== 'ok' && result.result !== 'not found') {
+      throw new Error(`Failed to delete document: ${result.result}`);
+    }
+
+    logger.info(`Deleted document from Cloudinary: ${publicId}`);
+    return result;
+  } catch (error) {
+    logger.error(`Failed to delete document: ${error.message}`);
+    throw error;
+  }
+};
+
+/**
+ * Generate a signed URL for document access (time-limited)
+ * @param {string} publicId - Cloudinary public ID
+ * @param {number} expiresIn - Expiration time in seconds (default 60)
+ * @returns {string} Signed URL
+ */
+export const generateSignedUrl = (publicId, expiresIn = 60) => {
+  try {
+    const url = cloudinary.utils.url(publicId, {
+      resource_type: 'raw',
+      secure: true,
+      sign_url: true,
+      expires_at: Math.floor(Date.now() / 1000) + expiresIn
+    });
+
+    return url;
+  } catch (error) {
+    logger.error(`Failed to generate signed URL: ${error.message}`);
+    throw error;
+  }
+};
+
 export default cloudinary;
