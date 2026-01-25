@@ -83,7 +83,30 @@ const watchItemSchema = new mongoose.Schema(
       trim: true
     },
     poster: {
-      type: posterSchema
+      type: mongoose.Schema.Types.Mixed,
+      // Can be either:
+      // 1. Cloudinary object: { publicId, url, width, height, format }
+      // 2. Direct URL string: "https://example.com/poster.jpg"
+      validate: {
+        validator: function(value) {
+          if (!value) return true; // Optional field
+          // If it's a string, it should be a valid URL
+          if (typeof value === 'string') {
+            try {
+              new URL(value);
+              return true;
+            } catch {
+              return false;
+            }
+          }
+          // If it's an object, it should have the posterSchema structure
+          if (typeof value === 'object' && value !== null) {
+            return value.publicId && value.url;
+          }
+          return false;
+        },
+        message: 'Poster must be either a valid URL string or a Cloudinary object with publicId and url'
+      }
     },
     currentSeason: {
       type: Number,

@@ -8,9 +8,10 @@ import { MESSAGES } from '../../config/constants.js';
  */
 export const createWatchItem = async (userId, itemData, posterFile = null) => {
   try {
-    // Upload poster to Cloudinary if provided
+    // Handle poster: either upload file to Cloudinary OR store URL directly
     let poster = null;
     if (posterFile) {
+      // Upload file to Cloudinary
       try {
         const posterData = await uploadImage(posterFile, 'lifeos/watch');
         poster = posterData;
@@ -18,6 +19,9 @@ export const createWatchItem = async (userId, itemData, posterFile = null) => {
         logger.error(`Failed to upload poster: ${error.message}`);
         // Continue without poster if upload fails
       }
+    } else if (itemData.posterUrl) {
+      // Store URL directly in database (no Cloudinary upload)
+      poster = itemData.posterUrl;
     }
 
     // Validate rating if provided
@@ -286,8 +290,8 @@ export const deleteWatchItem = async (itemId, userId) => {
       throw new Error(MESSAGES.NOT_FOUND);
     }
 
-    // Delete poster from Cloudinary if exists
-    if (watchItem.poster && watchItem.poster.publicId) {
+    // Delete poster from Cloudinary if exists (only if it's a Cloudinary object, not a URL)
+    if (watchItem.poster && typeof watchItem.poster === 'object' && watchItem.poster.publicId) {
       try {
         await deleteImage(watchItem.poster.publicId);
       } catch (error) {

@@ -20,7 +20,8 @@ export const createWatchItem = async (req, res, next) => {
       moodTags,
       notes,
       currentSeason,
-      currentEpisode
+      currentEpisode,
+      posterUrl
     } = req.body;
     const posterFile = req.file || null;
 
@@ -144,7 +145,8 @@ export const createWatchItem = async (req, res, next) => {
       moodTags: moodTagsArray,
       notes: notes?.trim(),
       currentSeason: currentSeason ? parseInt(currentSeason) : undefined,
-      currentEpisode: currentEpisode ? parseInt(currentEpisode) : undefined
+      currentEpisode: currentEpisode ? parseInt(currentEpisode) : undefined,
+      posterUrl: posterUrl || null
     };
 
     const watchItem = await watchService.createWatchItem(userId, itemData, posterFile);
