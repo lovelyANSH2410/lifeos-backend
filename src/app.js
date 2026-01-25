@@ -16,6 +16,15 @@ import tripRoutes from './modules/trips/trip.routes.js';
 import vaultRoutes from './modules/vault/vault.routes.js';
 import vaultDocumentRoutes from './modules/vaultDocuments/vaultDocument.routes.js';
 import ideaRoutes from './modules/ideas/idea.routes.js';
+import giftingRoutes from './modules/gifting/gifting.routes.js';
+import watchRoutes from './modules/watch/watch.routes.js';
+import incomeRoutes from './modules/money/income/income.routes.js';
+import fixedExpenseRoutes from './modules/money/fixedExpenses/fixedExpense.routes.js';
+import transactionRoutes from './modules/money/transactions/transaction.routes.js';
+import fundRoutes from './modules/money/funds/fund.routes.js';
+import debtRoutes from './modules/money/debts/debt.routes.js';
+import wishlistRoutes from './modules/money/wishlist/wishlist.routes.js';
+import overviewRoutes from './modules/money/overview/overview.routes.js';
 
 const app = express();
 
@@ -61,6 +70,15 @@ app.use('/api/trips', tripRoutes);
 app.use('/api/vault/documents', vaultDocumentRoutes);
 app.use('/api/vault', vaultRoutes);
 app.use('/api/ideas', ideaRoutes);
+app.use('/api/gifting', giftingRoutes);
+app.use('/api/watch', watchRoutes);
+app.use('/api/income', incomeRoutes);
+app.use('/api/fixed-expenses', fixedExpenseRoutes);
+app.use('/api/transactions', transactionRoutes);
+app.use('/api/funds', fundRoutes);
+app.use('/api/debts', debtRoutes);
+app.use('/api/wishlist', wishlistRoutes);
+app.use('/api/money/overview', overviewRoutes);
 
 // Placeholder routes for future modules
 app.use('/api/tasks', (req, res) => {
