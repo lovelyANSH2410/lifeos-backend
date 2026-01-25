@@ -2,6 +2,7 @@ import express from 'express';
 import multer from 'multer';
 import * as tripController from './trip.controller.js';
 import { authenticate } from '../../middlewares/auth.middleware.js';
+import { uploadRateLimiter } from '../../middlewares/uploadLimit.middleware.js';
 
 const router = express.Router();
 
@@ -47,6 +48,7 @@ router.use(authenticate);
 // Routes
 router.post(
   '/',
+  uploadRateLimiter, // Global upload rate limiting
   upload.single('coverImage'),
   handleMulterError,
   tripController.createTrip
@@ -60,6 +62,7 @@ router.get('/:id', tripController.getTripById);
 
 router.patch(
   '/:id',
+  uploadRateLimiter, // Global upload rate limiting
   upload.single('coverImage'),
   handleMulterError,
   tripController.updateTrip

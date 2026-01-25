@@ -2,6 +2,7 @@ import express from 'express';
 import multer from 'multer';
 import * as diaryController from './diary.controller.js';
 import { authenticate } from '../../middlewares/auth.middleware.js';
+import { uploadRateLimiter } from '../../middlewares/uploadLimit.middleware.js';
 
 const router = express.Router();
 
@@ -54,6 +55,7 @@ const handleMulterError = (err, req, res, next) => {
 // Routes
 router.post(
   '/',
+  uploadRateLimiter, // Global upload rate limiting
   upload.array('images', 5),
   handleMulterError,
   diaryController.createEntry

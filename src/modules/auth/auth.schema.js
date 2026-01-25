@@ -45,6 +45,32 @@ const userSchema = new mongoose.Schema(
       default: 'INR',
       trim: true,
       uppercase: true
+    },
+    profileImage: {
+      type: mongoose.Schema.Types.Mixed,
+      // Can be either:
+      // 1. Cloudinary object: { publicId, url, width, height, format }
+      // 2. Direct URL string: "https://example.com/avatar.jpg"
+      validate: {
+        validator: function(value) {
+          if (!value) return true; // Optional field
+          // If it's a string, it should be a valid URL
+          if (typeof value === 'string') {
+            try {
+              new URL(value);
+              return true;
+            } catch {
+              return false;
+            }
+          }
+          // If it's an object, it should have Cloudinary structure
+          if (typeof value === 'object' && value !== null) {
+            return value.publicId && value.url;
+          }
+          return false;
+        },
+        message: 'Profile image must be either a valid URL string or a Cloudinary object with publicId and url'
+      }
     }
   },
   {
@@ -82,6 +108,15 @@ userSchema.methods.comparePassword = async function (candidatePassword) {
 userSchema.methods.updateLastLogin = async function () {
   this.lastLogin = new Date();
   await this.save({ validateBeforeSave: false });
+};
+
+// Method to check if subscription is active
+userSchema.methods.isSubscriptionActive = function () {
+  if (!this.subscription) return true; // Default to active if no subscription data
+  if (this.subscription.plan === 'FREE') return true;
+  if (this.subscription.plan === 'LIFETIME') return true;
+  if (!this.subscription.expiresAt) return false;
+  return this.subscription.expiresAt > new Date();
 };
 
 const User = mongoose.model('User', userSchema);

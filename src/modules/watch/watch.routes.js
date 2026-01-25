@@ -2,6 +2,7 @@ import express from 'express';
 import multer from 'multer';
 import * as watchController from './watch.controller.js';
 import { authenticate } from '../../middlewares/auth.middleware.js';
+import { uploadRateLimiter } from '../../middlewares/uploadLimit.middleware.js';
 
 const router = express.Router();
 
@@ -47,6 +48,7 @@ router.use(authenticate);
 // Routes
 router.post(
   '/',
+  uploadRateLimiter, // Global upload rate limiting
   upload.single('poster'),
   handleMulterError,
   watchController.createWatchItem

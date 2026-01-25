@@ -36,6 +36,13 @@ export const uploadImage = async (file, folder = 'diary-entries') => {
     const base64 = fileBuffer.toString('base64');
     const fileData = `data:${mimeType};base64,${base64}`;
 
+    // Validate file size before uploading to Cloudinary
+    // Cloudinary free tier has a 10MB limit per file
+    const maxFileSize = 10 * 1024 * 1024; // 10MB
+    if (fileBuffer.length > maxFileSize) {
+      throw new Error('File size exceeds Cloudinary limit. Maximum size is 10MB');
+    }
+
     const result = await cloudinary.uploader.upload(fileData, {
       folder: folder,
       resource_type: 'image',
@@ -47,7 +54,9 @@ export const uploadImage = async (file, folder = 'diary-entries') => {
       ],
       // Free tier best practices
       overwrite: false,
-      invalidate: true
+      invalidate: true,
+      // Additional size validation
+      max_file_size: maxFileSize
     });
 
     return {
@@ -122,6 +131,13 @@ export const deleteImages = async (publicIds) => {
  */
 export const uploadDocument = async (fileBuffer, originalName, folder = 'lifeos/documents') => {
   try {
+    // Validate file size before uploading to Cloudinary
+    // Cloudinary free tier has a 10MB limit per file
+    const maxFileSize = 10 * 1024 * 1024; // 10MB
+    if (fileBuffer.length > maxFileSize) {
+      throw new Error('File size exceeds Cloudinary limit. Maximum size is 10MB');
+    }
+
     return new Promise((resolve, reject) => {
       const uploadStream = cloudinary.uploader.upload_stream(
         {

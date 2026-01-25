@@ -3,6 +3,7 @@ import multer from 'multer';
 import rateLimit from 'express-rate-limit';
 import * as vaultDocumentController from './vaultDocument.controller.js';
 import { authenticate } from '../../middlewares/auth.middleware.js';
+import { strictUploadRateLimiter } from '../../middlewares/uploadLimit.middleware.js';
 
 const router = express.Router();
 
@@ -24,7 +25,8 @@ const upload = multer({
   }
 });
 
-// Rate limiter for document upload endpoint
+// Rate limiter for document upload endpoint (kept for backward compatibility)
+// Now also using strictUploadRateLimiter from uploadLimit.middleware.js
 const uploadLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 20, // Limit each IP to 20 uploads per windowMs
@@ -61,7 +63,8 @@ router.use(authenticate);
 // Routes
 router.post(
   '/',
-  uploadLimiter,
+  strictUploadRateLimiter, // Strict rate limiting for large files (10 uploads/hour)
+  uploadLimiter, // Additional per-route limiter (20 uploads/15min)
   upload.single('file'),
   handleMulterError,
   vaultDocumentController.createVaultDocument

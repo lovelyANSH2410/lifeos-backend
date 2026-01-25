@@ -2,6 +2,7 @@ import { validationResult } from 'express-validator';
 import { sendSuccess, sendError, sendValidationError } from '../../utils/response.util.js';
 import { HTTP_STATUS, MESSAGES } from '../../config/constants.js';
 import * as authService from './auth.service.js';
+import { uploadImage, deleteImage } from '../../utils/cloudinary.util.js';
 import logger from '../../utils/logger.util.js';
 
 /**
@@ -86,6 +87,7 @@ export const getProfile = async (req, res, next) => {
 export const updateProfile = async (req, res, next) => {
   try {
     const { name, currency } = req.body;
+    const profileImageFile = req.file || null;
 
     // Validate currency if provided
     if (currency) {
@@ -117,6 +119,31 @@ export const updateProfile = async (req, res, next) => {
     const updateData = {};
     if (name !== undefined) updateData.name = name.trim();
     if (currency !== undefined) updateData.currency = currency.toUpperCase();
+
+    // Handle profile image upload if provided
+    if (profileImageFile) {
+      try {
+        // Get current user to check for existing profile image
+        const currentUser = await authService.getUserById(req.user.id);
+        
+        // Delete old profile image from Cloudinary if exists
+        if (currentUser.profileImage && typeof currentUser.profileImage === 'object' && currentUser.profileImage.publicId) {
+          try {
+            await deleteImage(currentUser.profileImage.publicId);
+          } catch (error) {
+            logger.error(`Failed to delete old profile image: ${error.message}`);
+            // Continue even if deletion fails
+          }
+        }
+
+        // Upload new profile image
+        const imageData = await uploadImage(profileImageFile, 'lifeos/profiles');
+        updateData.profileImage = imageData;
+      } catch (error) {
+        logger.error(`Failed to upload profile image: ${error.message}`);
+        return sendError(res, 'Failed to upload profile image', HTTP_STATUS.BAD_REQUEST);
+      }
+    }
 
     const user = await authService.updateUserProfile(req.user.id, updateData);
     return sendSuccess(res, user, 'Profile updated successfully');

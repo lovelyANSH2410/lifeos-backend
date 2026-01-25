@@ -12,6 +12,7 @@ import authRoutes from './modules/auth/auth.routes.js';
 import dashboardRoutes from './modules/dashboard/dashboard.routes.js';
 import diaryRoutes from './modules/diary/diary.routes.js';
 import subscriptionRoutes from './modules/subscriptions/subscription.routes.js';
+import userSubscriptionRoutes from './modules/subscription/subscription.routes.js';
 import tripRoutes from './modules/trips/trip.routes.js';
 import vaultRoutes from './modules/vault/vault.routes.js';
 import vaultDocumentRoutes from './modules/vaultDocuments/vaultDocument.routes.js';
@@ -65,6 +66,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/diary', diaryRoutes);
 app.use('/api/subscriptions', subscriptionRoutes);
+app.use('/api/subscription', userSubscriptionRoutes);
 app.use('/api/trips', tripRoutes);
 // Mount more specific routes first to avoid route conflicts
 app.use('/api/vault/documents', vaultDocumentRoutes);

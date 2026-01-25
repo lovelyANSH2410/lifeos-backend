@@ -102,7 +102,7 @@ export const getUserById = async (userId) => {
  */
 export const updateUserProfile = async (userId, updateData) => {
   try {
-    const allowedFields = ['name', 'currency'];
+    const allowedFields = ['name', 'currency', 'profileImage'];
     const updateFields = {};
 
     // Only allow specific fields to be updated
