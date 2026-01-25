@@ -15,6 +15,7 @@ import subscriptionRoutes from './modules/subscriptions/subscription.routes.js';
 import tripRoutes from './modules/trips/trip.routes.js';
 import vaultRoutes from './modules/vault/vault.routes.js';
 import vaultDocumentRoutes from './modules/vaultDocuments/vaultDocument.routes.js';
+import ideaRoutes from './modules/ideas/idea.routes.js';
 
 const app = express();
 
@@ -59,6 +60,7 @@ app.use('/api/trips', tripRoutes);
 // Mount more specific routes first to avoid route conflicts
 app.use('/api/vault/documents', vaultDocumentRoutes);
 app.use('/api/vault', vaultRoutes);
+app.use('/api/ideas', ideaRoutes);
 
 // Placeholder routes for future modules
 app.use('/api/tasks', (req, res) => {
