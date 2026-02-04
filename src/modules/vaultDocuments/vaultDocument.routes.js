@@ -4,6 +4,7 @@ import rateLimit from 'express-rate-limit';
 import * as vaultDocumentController from './vaultDocument.controller.js';
 import { authenticate } from '../../middlewares/auth.middleware.js';
 import { strictUploadRateLimiter } from '../../middlewares/uploadLimit.middleware.js';
+import { checkSubscriptionLimitMiddleware } from '../../middlewares/subscriptionLimit.middleware.js';
 
 const router = express.Router();
 
@@ -63,6 +64,7 @@ router.use(authenticate);
 // Routes
 router.post(
   '/',
+  checkSubscriptionLimitMiddleware('documents'), // Check subscription limit
   strictUploadRateLimiter, // Strict rate limiting for large files (10 uploads/hour)
   uploadLimiter, // Additional per-route limiter (20 uploads/15min)
   upload.single('file'),

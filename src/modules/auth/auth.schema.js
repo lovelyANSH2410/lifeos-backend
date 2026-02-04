@@ -71,6 +71,34 @@ const userSchema = new mongoose.Schema(
         },
         message: 'Profile image must be either a valid URL string or a Cloudinary object with publicId and url'
       }
+    },
+    subscription: {
+      plan: {
+        type: String,
+        enum: ['FREE', 'PRO', 'COUPLE', 'LIFETIME'],
+        default: 'FREE'
+      },
+      billingCycle: {
+        type: String,
+        enum: ['NONE', 'MONTHLY', 'YEARLY'],
+        default: 'NONE'
+      },
+      price: {
+        type: Number,
+        default: 0
+      },
+      startedAt: {
+        type: Date,
+        default: null
+      },
+      expiresAt: {
+        type: Date,
+        default: null
+      },
+      isActive: {
+        type: Boolean,
+        default: true
+      }
     }
   },
   {

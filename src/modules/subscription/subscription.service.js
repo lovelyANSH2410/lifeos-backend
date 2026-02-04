@@ -140,7 +140,12 @@ export const upgradeSubscription = async (userId, plan, billingCycle) => {
       isActive: true
     };
 
+    // Mark subscription as modified to ensure Mongoose saves it
+    user.markModified('subscription');
+    
     await user.save();
+    
+    logger.info(`Subscription upgraded for user ${userId}: plan=${plan}, billingCycle=${billingCycle}, price=${price}`);
 
     // Return updated subscription
     return getUserSubscription(userId);

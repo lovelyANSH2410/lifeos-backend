@@ -2,6 +2,7 @@ import express from 'express';
 import rateLimit from 'express-rate-limit';
 import * as vaultController from './vault.controller.js';
 import { authenticate } from '../../middlewares/auth.middleware.js';
+import { checkSubscriptionLimitMiddleware } from '../../middlewares/subscriptionLimit.middleware.js';
 
 const router = express.Router();
 
@@ -21,7 +22,7 @@ const revealLimiter = rateLimit({
 router.use(authenticate);
 
 // Routes
-router.post('/', vaultController.createVaultItem);
+router.post('/', checkSubscriptionLimitMiddleware('vault'), vaultController.createVaultItem);
 
 router.get('/', vaultController.getVaultItems);
 
