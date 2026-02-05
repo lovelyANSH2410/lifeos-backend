@@ -27,6 +27,7 @@ import debtRoutes from './modules/money/debts/debt.routes.js';
 import wishlistRoutes from './modules/money/wishlist/wishlist.routes.js';
 import overviewRoutes from './modules/money/overview/overview.routes.js';
 import { examRouter, subjectRouter, topicRouter } from './modules/exams/exam.routes.js';
+import studyEventRoutes from './modules/studyEvents/studyEvent.routes.js';
 
 const app = express();
 
@@ -85,6 +86,7 @@ app.use('/api/money/overview', overviewRoutes);
 app.use('/api/exams', examRouter);
 app.use('/api/subjects', subjectRouter);
 app.use('/api/topics', topicRouter);
+app.use('/api/study-events', studyEventRoutes);
 
 // Placeholder routes for future modules
 app.use('/api/tasks', (req, res) => {
