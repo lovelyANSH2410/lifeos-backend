@@ -70,6 +70,53 @@ export const getExamById = async (req, res, next) => {
   }
 };
 
+export const updateExam = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const { examId } = req.params;
+    const { name, examDate } = req.body;
+    const exam = await examService.updateExam(examId, userId, {
+      name: name?.trim(),
+      examDate
+    });
+    const data = exam.toObject ? exam.toObject() : exam;
+    const subjects = await examService.getSubjectsByExamId(examId, userId);
+    const subjectIds = subjects.map((s) => s._id);
+    const topicsBySubject = subjectIds.length
+      ? await examService.getTopicsGroupedBySubject(subjectIds)
+      : {};
+    const subjectProgressByExam = await examService.getSubjectProgressGroupedByExam(
+      [exam._id],
+      topicsBySubject
+    );
+    const progress = subjectProgressByExam[exam._id.toString()]
+      ? progressService.getExamProgress(subjectProgressByExam[exam._id.toString()])
+      : 0;
+    return sendSuccess(res, { ...data, progress }, 'Exam updated');
+  } catch (error) {
+    logger.error(`Update exam: ${error.message}`);
+    if (error.message === MESSAGES.NOT_FOUND) {
+      return sendError(res, error.message, HTTP_STATUS.NOT_FOUND);
+    }
+    next(error);
+  }
+};
+
+export const deleteExam = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const { examId } = req.params;
+    await examService.deleteExam(examId, userId);
+    return sendSuccess(res, null, 'Exam deleted');
+  } catch (error) {
+    logger.error(`Delete exam: ${error.message}`);
+    if (error.message === MESSAGES.NOT_FOUND) {
+      return sendError(res, error.message, HTTP_STATUS.NOT_FOUND);
+    }
+    next(error);
+  }
+};
+
 export const createSubject = async (req, res, next) => {
   try {
     const userId = req.user.id;
@@ -100,6 +147,42 @@ export const getSubjects = async (req, res, next) => {
     return sendSuccess(res, withProgress, 'Subjects retrieved');
   } catch (error) {
     logger.error(`Get subjects: ${error.message}`);
+    if (error.message === MESSAGES.NOT_FOUND) {
+      return sendError(res, error.message, HTTP_STATUS.NOT_FOUND);
+    }
+    next(error);
+  }
+};
+
+export const updateSubject = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const { subjectId } = req.params;
+    const { name } = req.body;
+    if (!name || !name.trim()) {
+      return sendValidationError(res, [{ field: 'name', message: 'Name is required' }]);
+    }
+    const subject = await examService.updateSubject(subjectId, userId, { name: name.trim() });
+    const topics = await examService.getTopicsBySubjectId(subjectId, userId);
+    const progress = progressService.getSubjectProgress(topics);
+    return sendSuccess(res, { ...subject.toObject(), progress }, 'Subject updated');
+  } catch (error) {
+    logger.error(`Update subject: ${error.message}`);
+    if (error.message === MESSAGES.NOT_FOUND) {
+      return sendError(res, error.message, HTTP_STATUS.NOT_FOUND);
+    }
+    next(error);
+  }
+};
+
+export const deleteSubject = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const { subjectId } = req.params;
+    await examService.deleteSubject(subjectId, userId);
+    return sendSuccess(res, null, 'Subject deleted');
+  } catch (error) {
+    logger.error(`Delete subject: ${error.message}`);
     if (error.message === MESSAGES.NOT_FOUND) {
       return sendError(res, error.message, HTTP_STATUS.NOT_FOUND);
     }
@@ -161,6 +244,44 @@ export const updateTopicProgress = async (req, res, next) => {
     return sendSuccess(res, withProgress, 'Topic progress updated');
   } catch (error) {
     logger.error(`Update topic progress: ${error.message}`);
+    if (error.message === MESSAGES.NOT_FOUND) {
+      return sendError(res, error.message, HTTP_STATUS.NOT_FOUND);
+    }
+    next(error);
+  }
+};
+
+export const updateTopic = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const { topicId } = req.params;
+    const { name } = req.body;
+    if (!name || !name.trim()) {
+      return sendValidationError(res, [{ field: 'name', message: 'Name is required' }]);
+    }
+    const topic = await examService.updateTopic(topicId, userId, { name: name.trim() });
+    const withProgress = {
+      ...topic.toObject(),
+      progress: progressService.getTopicProgress(topic)
+    };
+    return sendSuccess(res, withProgress, 'Topic updated');
+  } catch (error) {
+    logger.error(`Update topic: ${error.message}`);
+    if (error.message === MESSAGES.NOT_FOUND) {
+      return sendError(res, error.message, HTTP_STATUS.NOT_FOUND);
+    }
+    next(error);
+  }
+};
+
+export const deleteTopic = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const { topicId } = req.params;
+    await examService.deleteTopic(topicId, userId);
+    return sendSuccess(res, null, 'Topic deleted');
+  } catch (error) {
+    logger.error(`Delete topic: ${error.message}`);
     if (error.message === MESSAGES.NOT_FOUND) {
       return sendError(res, error.message, HTTP_STATUS.NOT_FOUND);
     }
