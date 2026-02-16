@@ -4,18 +4,16 @@ import env from '../config/env.js';
 /**
  * General API rate limiter
  */
-export const apiLimiter = 'true' == 'false'
-  ? rateLimit({
-      windowMs: env.RATE_LIMIT_WINDOW_MS,
-      max: env.RATE_LIMIT_MAX_REQUESTS,
-      message: {
-        success: false,
-        message: 'Too many requests from this IP, please try again later.'
-      },
-      standardHeaders: true,
-      legacyHeaders: false
-    })
-  : (req, res, next) => next(); // no-op middleware
+export const apiLimiter = rateLimit({
+  windowMs: env.RATE_LIMIT_WINDOW_MS,
+  max: env.RATE_LIMIT_MAX_REQUESTS,
+  message: {
+    success: false,
+    message: 'Too many requests from this IP, please try again later.'
+  },
+  standardHeaders: true,
+  legacyHeaders: false
+});
 
 /**
  * Strict rate limiter for authentication endpoints
