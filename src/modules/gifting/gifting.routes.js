@@ -3,6 +3,7 @@ import multer from 'multer';
 import * as giftingController from './gifting.controller.js';
 import { authenticate } from '../../middlewares/auth.middleware.js';
 import { uploadRateLimiter } from '../../middlewares/uploadLimit.middleware.js';
+import { checkSubscriptionLimitMiddleware } from '../../middlewares/subscriptionLimit.middleware.js';
 
 const router = express.Router();
 
@@ -55,6 +56,7 @@ router.use(authenticate);
 // Routes
 router.post(
   '/',
+  checkSubscriptionLimitMiddleware('gifting'), // Check subscription limit
   uploadRateLimiter, // Global upload rate limiting
   upload.array('images', 3),
   handleMulterError,

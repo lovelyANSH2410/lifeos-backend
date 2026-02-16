@@ -37,5 +37,8 @@ export default {
   CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY,
   CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET,
   // Vault encryption key (32 bytes for AES-256)
-  VAULT_ENCRYPTION_KEY: process.env.VAULT_ENCRYPTION_KEY
+  VAULT_ENCRYPTION_KEY: process.env.VAULT_ENCRYPTION_KEY,
+  // Razorpay configuration
+  RAZORPAY_KEY_ID: process.env.RAZORPAY_KEY_ID,
+  RAZORPAY_KEY_SECRET: process.env.RAZORPAY_KEY_SECRET
 };
