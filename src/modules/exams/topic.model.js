@@ -15,8 +15,7 @@ const topicSchema = new mongoose.Schema(
     },
     study: { type: Boolean, default: false },
     rev1: { type: Boolean, default: false },
-    rev2: { type: Boolean, default: false },
-    rev3: { type: Boolean, default: false }
+    rev2: { type: Boolean, default: false }
   },
   { timestamps: true }
 );
