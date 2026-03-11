@@ -1,7 +1,7 @@
-const TOPIC_STEPS = 4;
+const TOPIC_STEPS = 3;
 
 export const getTopicProgress = (topic) => {
-  const completed = [topic.study, topic.rev1, topic.rev2, topic.rev3].filter(Boolean).length;
+  const completed = [topic.study, topic.rev1, topic.rev2].filter(Boolean).length;
   return Math.round((completed / TOPIC_STEPS) * 100);
 };
 

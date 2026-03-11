@@ -97,7 +97,7 @@ export const getTopicsBySubjectId = async (subjectId, userId) => {
   return Topic.find({ subjectId }).sort({ createdAt: 1 }).lean();
 };
 
-const ALLOWED_PROGRESS_FIELDS = ['study', 'rev1', 'rev2', 'rev3'];
+const ALLOWED_PROGRESS_FIELDS = ['study', 'rev1', 'rev2'];
 
 export const updateTopicProgress = async (topicId, userId, updates) => {
   const topic = await Topic.findById(topicId);

@@ -230,12 +230,11 @@ export const updateTopicProgress = async (req, res, next) => {
   try {
     const userId = req.user.id;
     const { topicId } = req.params;
-    const { study, rev1, rev2, rev3 } = req.body;
+    const { study, rev1, rev2 } = req.body;
     const updates = {};
     if (study !== undefined) updates.study = study;
     if (rev1 !== undefined) updates.rev1 = rev1;
     if (rev2 !== undefined) updates.rev2 = rev2;
-    if (rev3 !== undefined) updates.rev3 = rev3;
     const topic = await examService.updateTopicProgress(topicId, userId, updates);
     const withProgress = {
       ...topic.toObject(),
